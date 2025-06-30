@@ -1,30 +1,34 @@
-# export-aseprite-file
+# aseprite-export-tilemap
 
-> by David Capello
-
-This is a script that can be used to export the data from a
-`.aseprite` file into a JSON + a collection of PNG files.  This script
-will work with Aseprite v1.2.26 and support the future v1.3 to export
-tilemap/tileset data.
+This is based on a fork of
+[export-aseprite-file](https://github.com/dacap/export-aseprite-file) by
+David Capello. This project uses
+[json.lua](https://github.com/rxi/json.lua) by
+[rxi](https://github.com/rxi) to export Lua tables to JSON files.
 
 ## Example
 
-Usage:
-
-    aseprite -b map.aseprite -script export.lua
-
-In this example `export.lua` will create a folder named `map` with
-some files inside:
+This script will export data either as JSON or as binary.
 
 ```
-map/
-  sprite.json
-  image1.png
-  image2.png
-  tileset1.png
+# binary
+aseprite -b map.aseprite --script-param export-type=bin --script export.lua
+
+# JSON
+aseprite -b map.aseprite --script-param export-type=json --script export.lua
 ```
 
-An example of `map/sprite.json` content:
+The script will create a folder named `map` in the same parent directory as
+`map.aseprite` and will add some files to the new `map` directory. The files
+added depend on which export type the user selected.
+
+Read the file documentation of [binary.lua](./binary.lua) to see the schema
+of binary output.
+
+<details>
+<summary>Expand to see an example of exported JSON data.</summary>
+If the JSON export type was selected, one of the emitted files will be
+`map/sprite.json` and will have the following example content:
 
 ```json
 {
@@ -147,14 +151,4 @@ An example of `map/sprite.json` content:
   ]
 }
 ```
-
-## Acknowledges
-
-This project uses [json.lua](https://github.com/rxi/json.lua) by
-[rxi](https://github.com/rxi) to export Lua tables to JSON files.
-
-## License
-
-This code is distributed under the terms of the MIT license. You can
-use this code for your own purpose to export the specific data that
-you need.
+</details>

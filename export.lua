@@ -1,7 +1,18 @@
 -- export.lua
--- Copyright (C) 2020  David Capello
---
--- This file is released under the terms of the MIT license.
+-- Copyright
+-- - (C) 2020 David Capello
+-- - (C) 2025 orphen
+
+local export_type = app.params["export-type"]
+if not export_type then return print "Need command-line argument `export-type`" end
+local valid_export_values = { ["json"] = true, ["bin"] = true }
+if not valid_export_values[export_type] then
+  print("Invalid export type: " .. export_type .. ". Valid values are:")
+  for key, _ in pairs(valid_export_values) do
+    print(key)
+  end
+  return
+end
 
 local spr = app.sprite
 if not spr then spr = app.activeSprite end -- just to support older versions of Aseprite
@@ -20,6 +31,13 @@ local function write_json_data(filename, data)
   local json = dofile('./json.lua')
   local file = io.open(filename, "w")
   file:write(json.encode(data))
+  file:close()
+end
+
+local function write_binary_data(filename, data)
+  local binary = dofile("./binary.lua")
+  local file = io.open(filename, "wb")
+  binary.encode(file, data)
   file:close()
 end
 
@@ -69,6 +87,9 @@ local function export_tileset(tileset)
   return t
 end
 
+-- A tileset is a collection of tiles; sprites can be drawn from multiple
+-- tilesets.
+-- https://www.aseprite.org/api/tileset#tileset
 local function export_tilesets(tilesets)
   local t = {}
   for _,tileset in ipairs(tilesets) do
@@ -77,6 +98,8 @@ local function export_tilesets(tilesets)
   return t
 end
 
+-- Frames are a basic concept of animation for a sprite.
+-- https://www.aseprite.org/api/frame#frame
 local function export_frames(frames)
   local t = {}
   for _,frame in ipairs(frames) do
@@ -115,6 +138,10 @@ local function export_cel(cel)
   return t
 end
 
+-- Export cels. A cel is an image in a specific layer in a specific frame at a
+-- certain (x,y) coordinate.
+-- https://www.aseprite.org/api/cel#cel
+-- https://www.aseprite.org/docs/cel/
 local function export_cels(cels)
   local t = {}
   for _,cel in ipairs(cels) do
@@ -156,6 +183,9 @@ local function export_layer(layer, export_layers)
   return t
 end
 
+-- A layer is a entry in a stack of images in a sprite. Layers can have child
+-- layers, which makes the parent layer a group layer.
+-- https://www.aseprite.org/api/layer
 local function export_layers(layers)
   local t = {}
   for _,layer in ipairs(layers) do
@@ -164,6 +194,8 @@ local function export_layers(layers)
   return t
 end
 
+-- An "aniDir" is the animation direction of a tag.
+-- https://www.aseprite.org/api/tag#taganidir
 local function ani_dir(d)
   local values = { "forward", "reverse", "pingpong" }
   return values[d+1]
@@ -180,6 +212,9 @@ local function export_tag(tag)
   return t
 end
 
+-- Export tags. Each tag is an animation of a sprite. Longer animations can
+-- be broken up into parts using tags.
+-- https://www.aseprite.org/docs/tags/
 local function export_tags(tags)
   local t = {}
   for _,tag in ipairs(tags) do
@@ -210,6 +245,9 @@ local function export_slice(slice)
   return t
 end
 
+-- Export slices. A slice is an object that allows for nine-slice scaling of a
+-- part of a sprite.
+-- https://www.aseprite.org/api/slice#slice
 local function export_slices(slices)
   local t = {}
   for _,slice in ipairs(slices) do
@@ -218,15 +256,10 @@ local function export_slices(slices)
   return t
 end
 
-----------------------------------------------------------------------
--- Creates output folder
-
+-- Create output folder and write /sprite.json to it.
 fs.makeDirectory(output_folder)
-
-----------------------------------------------------------------------
--- Write /sprite.json file in the output folder
-
 local jsonFn = fs.joinPath(output_folder, "sprite.json")
+local binaryFn = fs.joinPath(output_folder, "sprite.bin")
 local data = {
   filename=spr.filename,
   width=spr.width,
@@ -243,4 +276,10 @@ end
 if pcall(function() return spr.tilesets end) then
   data.tilesets = export_tilesets(spr.tilesets)
 end
-write_json_data(jsonFn, data)
+if export_type == "json" then
+  write_json_data(jsonFn, data)
+elseif export_type == "bin" then
+  write_binary_data(binaryFn, data)
+else
+  error("Unexpected export type: " .. export_type)
+end
