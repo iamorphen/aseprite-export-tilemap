@@ -6,7 +6,7 @@ David Capello. This project uses
 [json.lua](https://github.com/rxi/json.lua) by
 [rxi](https://github.com/rxi) to export Lua tables to JSON files.
 
-## Example
+## Usage
 
 This script will export data either as JSON or as binary.
 
@@ -24,6 +24,12 @@ added depend on which export type the user selected.
 
 Read the file documentation of [binary.lua](./binary.lua) to see the schema
 of binary output.
+
+You can inspect binary output using `test/binary_parser.py`. For example:
+
+```
+python3 test/binary_parser.py /path/to/sprite.bin
+```
 
 <details>
 <summary>Expand to see an example of exported JSON data.</summary>

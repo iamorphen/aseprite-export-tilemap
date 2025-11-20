@@ -23,8 +23,8 @@
 -- string
 -- ------
 -- A string is a single `uint64_t` indicating the number of characters
--- immediately following and then said number of characters. The characters are
--- 8-bit bytes. Each byte is a single ASCII character.
+-- immediately following and then said number of characters. Each character is a
+-- single ASCII character encoded as a uint8_t.
 --
 -- tileset
 -- -------
