@@ -256,10 +256,11 @@ local function export_slices(slices)
   return t
 end
 
--- Create output folder and write /sprite.json to it.
+-- Create output folder and write the JSON or binary file to it.
 fs.makeDirectory(output_folder)
-local jsonFn = fs.joinPath(output_folder, "sprite.json")
-local binaryFn = fs.joinPath(output_folder, "sprite.bin")
+local stem = app.fs.fileTitle(spr.filename)
+local jsonFn = fs.joinPath(output_folder, stem .. ".json")
+local binaryFn = fs.joinPath(output_folder, stem .. ".bin")
 local data = {
   filename=spr.filename,
   width=spr.width,

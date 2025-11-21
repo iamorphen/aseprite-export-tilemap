@@ -20,7 +20,12 @@ aseprite -b map.aseprite --script-param export-type=json --script export.lua
 
 The script will create a folder named `map` in the same parent directory as
 `map.aseprite` and will add some files to the new `map` directory. The files
-added depend on which export type the user selected.
+added depend on which export type the user selected. The root JSON or binary
+file will use the stem of the aseprite file name you provided; for example,
+in this case it will be `map/map.{json|bin}`. Note that file paths in the
+encoded output are relative to the directory you run `aseprite` if you provide
+a relative path to the aseprite file. If you provide an absolute path, file
+paths in the output are absolute.
 
 Read the file documentation of [binary.lua](./binary.lua) to see the schema
 of binary output.
@@ -28,7 +33,7 @@ of binary output.
 You can inspect binary output using `test/binary_parser.py`. For example:
 
 ```
-python3 test/binary_parser.py /path/to/sprite.bin
+python3 test/binary_parser.py /path/to/map.bin
 ```
 
 <details>
